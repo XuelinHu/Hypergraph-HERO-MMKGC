@@ -1,5 +1,6 @@
 # === LaTeX build artifacts ===
 *.aux
+*.abs
 *.log
 *.out
 *.toc
