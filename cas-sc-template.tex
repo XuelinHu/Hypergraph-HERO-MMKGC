@@ -1,4 +1,4 @@
-%% 
+﻿%% 
 %% Copyright 2019-2024 Elsevier Ltd
 %% 
 %% This file is part of the 'CAS Bundle'.
@@ -113,19 +113,20 @@
 %       twitter=<twitter id>,
 %       linkedin=<linkedin id>,
 %       gplus=<gplus id>]
-
 \author[or0]{Jingchao Wang}
 \ead{static@zut.edu.cn}
-\credit{Conceptualization, Methodology, Writing – original draft}
+\credit{Conceptualization, Methodology, Writing -- original draft}
 
 
 \author[or0]{Xiaodan Cui}
 \ead{cuixiaodan2026@163.com}
-\credit{Data curation, Writing – original draft}
+\credit{Data curation, Writing -- original draft}
 
-\author[or1]{Ruichen Cong}
-\ead{rcong@aoni.waseda.jp}
-\credit{Editing, Supervision}
+\author[or1]{Xuelin Hu}
+\ead{huxl@ltzy.edu.cn}
+\cormark[1]
+\credit{Conceptualization, Methodology, Writing -- original draft}
+
 
 \author[or2]{Xinyi Zhang}
 \ead{xinyizhang@shu.edu.cn}
@@ -135,13 +136,7 @@
 \ead{fy.liu1@siat.ac.cn}
 \credit{Reviewing, Supervision}
 
-\author[or4]{Xuelin Hu}
-\ead{huxl@ltzy.edu.cn}
-\cormark[1]
-\credit{Conceptualization, Methodology, Writing – original draft}
-
-
-\author[or4]{Xiaoqin Fu}
+\author[or1]{Xiaoqin Fu}
 \ead{fuxiaoqin@ltzy.edu.cn}
 \credit{Reviewing, Supervision}
 
@@ -150,10 +145,10 @@
             postcode={450007}, 
             country={China}}
 
-\affiliation[or1]{organization={Faculty of Human Sciences, Waseda University},
-            city={Tokorozawa},
-            postcode={359-1192}, 
-            country={Japan}}
+\affiliation[or1]{organization={School of Railway Communication and Signaling Engineering, Liuzhou Railway Vocational Technical College},
+            city={Liuzhou},
+            postcode={545000}, 
+            country={China}}
 
 \affiliation[or2]{organization={School of Computer Engineering and Science, Shanghai University},%Department and Organization
             city={Shanghai},
@@ -164,12 +159,6 @@
             city={Shenzhen},
             postcode={518055}, 
             country={China}}
-
-\affiliation[or4]{organization={School of Railway Communication and Signaling Engineering, Liuzhou Railway Vocational Technical College},
-            city={Liuzhou},
-            postcode={545000}, 
-            country={China}}
-
 
 % Corresponding author text
 \cortext[1]{Corresponding author}
@@ -183,7 +172,7 @@
 
 % Here goes the abstract
 \begin{abstract}
-Multimodal Knowledge Graph Completion (MMKGC) infers missing facts by combining structural triples with auxiliary information such as text and images. Existing methods usually improve entity representations through multimodal fusion, but their structural modeling still largely follows pairwise relation edges. This design limits their ability to capture higher-order dependencies among entities that participate in the same relation semantics. In addition, noisy descriptions, irrelevant visual signals, and structural perturbations can disturb representation learning and narrow the score margin between correct and confusing candidates. This paper proposes HERO, a hypergraph-enhanced relation-aware robust reasoning framework for MMKGC. HERO represents each relation type as a relation-specific hyperedge that connects its associated entities, so that relation-level multi-entity dependencies can be modeled explicitly. Multimodal pre-training is then performed on the relation hypergraph to integrate textual, visual, and high-order structural information into entity and relation representations. During candidate inference, HERO builds context-aware subgraphs from bidirectional neighborhoods and multi-hop paths, and uses a relation-aware graph attention network to aggregate target-relevant local evidence. A perturbation consistency objective further aligns clean and perturbed branches at both representation and score levels, improving ranking stability under multimodal noise and structural perturbations. Experiments on three MMKGC benchmarks show that HERO achieves consistent improvements over competitive baselines and maintains stronger robustness under corrupted inputs.
+Multimodal Knowledge Graph Completion (MMKGC) infers missing facts by combining structural triples with auxiliary information such as text and images. Existing methods usually improve entity representations through multimodal fusion, but their structural modeling still largely follows pairwise relation edges, which limits their ability to capture higher-order dependencies among entities sharing the same relation semantics. They are also vulnerable to noisy descriptions, irrelevant visual signals, and structural perturbations, which can disturb representation learning and reduce the score margin between correct and confusing candidates. This paper proposes HERO, a hypergraph-enhanced relation-aware robust reasoning framework for MMKGC. To address the limitation of pairwise structural modeling, HERO represents each relation type as a relation-specific hyperedge and performs multimodal pre-training on the resulting relation hypergraph, integrating textual, visual, and high-order structural information into entity and relation representations. To exploit target-specific evidence, HERO builds context-aware subgraphs from bidirectional neighborhoods and relation-relevant multi-hop paths, and uses a relation-aware graph attention network to aggregate local evidence for each candidate triple. To improve robustness, a perturbation consistency objective aligns clean and perturbed branches at both representation and score levels, improving ranking stability under multimodal noise and structural perturbations. Experiments on three MMKGC benchmarks show that HERO achieves consistent improvements over competitive baselines, while ablation and robustness analyses verify the contribution of relation hypergraph modeling, candidate-specific reasoning, and perturbation consistency.
 
 \end{abstract}
 
@@ -196,6 +185,7 @@ Multimodal Knowledge Graph Completion (MMKGC) infers missing facts by combining 
 \begin{highlights}
     \item A relation hypergraph-enhanced robust reasoning framework, HERO, is proposed.
     \item A relation-level high-order modeling module captures multi-entity dependencies.
+    \item A candidate-specific reasoning module exploits target-relevant local evidence.
     \item A perturbation-consistent optimization strategy enhances noise-stable reasoning.
     \item HERO consistently outperforms competitive baselines on MMKGC benchmarks.
 \end{highlights}
@@ -279,7 +269,7 @@ Recent studies further improve MMKGC by exploring adaptive fusion, fine-grained 
 
 Robust optimization and negative sampling have also been explored for discriminative MMKGC training. MMRNS~\cite{xu2022rens} constructs relation-enhanced multimodal negative samples, while MANS~\cite{zhang2023mans} introduces modality-aware negative sampling. DHNS~\cite{niu2025dhns} uses diffusion-based hierarchical sampling to generate graph- and modality-aware negatives. ComCon~\cite{chen2026comcon} decomposes multimodal representations into complementary and contradictory components and reweights negative samples, and HFR-MKGC~\cite{wang2026hfr} combines hierarchical fusion with MLLM-assisted reasoning for candidate generation and hard negative construction. These studies suggest that robust MMKGC requires expressive multimodal representations, informative supervision, and stable optimization under noisy or incomplete modalities.
 
-Despite these advances, existing multimodal knowledge concept recognition (MMKGC) methods still face two key challenges. First, most methods represent structural facts as independent pairwise edges, which limits their ability to capture relation-level high-order dependencies among multiple entities sharing the same relation semantics. Second, although multimodal fusion and neighborhood-based reasoning improve entity representation learning, representation propagation and triple scoring are rarely regularized from the perspective of perturbation stability, making candidate fact prediction sensitive to modality noise and structural perturbations. Different from existing methods, HERO introduces relation hypergraph modeling to explicitly organize multi-entity dependencies under shared relation semantics, and further combines context-aware local reasoning with perturbation consistency optimization to enhance both structural expressiveness and noise-stable reasoning for MMKGC.
+Despite these advances, existing multimodal knowledge graph completion (MMKGC) methods still face two key challenges. First, most methods represent structural facts as independent pairwise edges, which limits their ability to capture relation-level high-order dependencies among multiple entities sharing the same relation semantics. Second, although multimodal fusion and neighborhood-based reasoning improve entity representation learning, representation propagation and triple scoring are rarely regularized from the perspective of perturbation stability, making candidate fact prediction sensitive to modality noise and structural perturbations. Different from existing methods, HERO introduces relation hypergraph modeling to explicitly organize multi-entity dependencies under shared relation semantics, and further combines context-aware local reasoning with perturbation consistency optimization to enhance both structural expressiveness and noise-stable reasoning for MMKGC.
 
 \section{Preliminaries}
 \label{sec:preliminaries}
@@ -1697,9 +1687,11 @@ Table~\ref{tab:case_study} and Figure~\ref{fig:tsne_case_study} give complementa
 
 \section{Conclusion}
 \label{sec:conclusion}
-This paper presented HERO, a hypergraph-enhanced relation-aware robust reasoning framework for multimodal knowledge graph completion. The framework targets two limitations of existing MMKGC methods: insufficient modeling of relation-level high-order dependencies under pairwise structures, and unstable prediction under noisy multimodal and structural conditions. HERO converts each relation type into a relation-specific hyperedge, performs candidate-specific reasoning with dual-end neighborhoods and relation-relevant paths, and applies embedding- and score-level perturbation consistency for stable ranking. Experiments on multiple MMKGC benchmarks show consistent improvements over strong baselines, and the ablation, robustness, sensitivity, complexity, and case analyses support the contribution of each component.
+This paper presented HERO, a hypergraph-enhanced relation-aware robust reasoning framework for multimodal knowledge graph completion. The framework was designed around two limitations of existing MMKGC methods: insufficient modeling of relation-level high-order dependencies under pairwise structures, and unstable prediction under noisy multimodal and structural conditions. Correspondingly, HERO converts each relation type into a relation-specific hyperedge to model high-order multi-entity dependencies, performs candidate-specific reasoning with dual-end neighborhoods and relation-relevant paths to exploit target-related local evidence, and applies embedding- and score-level perturbation consistency to stabilize ranking under noisy inputs.
 
-Several limitations remain. HERO is evaluated mainly in a transductive and relatively static setting, while real MMKGs may evolve with new entities, relations, images, and descriptions. Extending HERO to inductive, dynamic, or incremental scenarios is therefore important. The current model also focuses on textual and visual modalities; richer signals such as audio, video, and temporal information may provide additional evidence but require stable cross-modal reasoning. Finally, candidate-specific subgraph construction and dual-branch robustness training increase training cost. More efficient subgraph sampling, path selection, and lightweight regularization could improve scalability, and the same ideas may also benefit multimodal entity alignment, knowledge graph question answering, and multi-hop reasoning.
+The experimental analysis is aligned with these design goals. Main results on three MMKGC benchmarks show consistent improvements over strong baselines. Ablation studies verify that relation hypergraph modeling, relation-aware local reasoning, and perturbation consistency each contribute to the final performance. Robustness experiments under textual noise, visual noise, and structural perturbation support the intended noise-stable behavior. Sensitivity and complexity analyses further show that HERO introduces additional training cost but keeps inference overhead practical, while case studies and t-SNE visualization provide qualitative evidence for more discriminative relation-aware representations.
+
+Several limitations remain. HERO is evaluated mainly in a transductive and relatively static setting, while real MMKGs may evolve with new entities, relations, images, and descriptions. Extending HERO to inductive, dynamic, or incremental scenarios is therefore important. The current model focuses on textual and visual modalities; richer signals such as audio, video, and temporal information may provide additional evidence but require stable cross-modal reasoning. Finally, candidate-specific subgraph construction and dual-branch robustness training increase training cost. More efficient subgraph sampling, path selection, and lightweight regularization could improve scalability, and the same ideas may also benefit multimodal entity alignment, knowledge graph question answering, and multi-hop reasoning.
 
 
 
