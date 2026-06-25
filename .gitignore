@@ -59,3 +59,9 @@ $RECYCLE.BIN/
 *.swo
 *.sublime-project
 *.sublime-workspace
+
+# === Python generated files ===
+__pycache__/
+*.py[cod]
+.pytest_cache/
+data/
