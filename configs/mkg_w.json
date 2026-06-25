@@ -1,0 +1,29 @@
+{
+  "dataset": {
+    "name": "MKG-W",
+    "root": "data/MKG-W"
+  },
+  "model": {
+    "dim": 256,
+    "hidden_dim": 512,
+    "hyper_layers": 2,
+    "dropout": 0.2
+  },
+  "train": {
+    "seed": 42,
+    "device": "cuda",
+    "pretrain_epochs": 50,
+    "finetune_epochs": 100,
+    "batch_size": 512,
+    "learning_rate": 0.0001,
+    "weight_decay": 0.00001,
+    "negative_ratio": 1,
+    "lambda_cl": 0.1,
+    "lambda_emb": 0.1,
+    "lambda_score": 0.1,
+    "sigma_entity": 0.03,
+    "sigma_relation": 0.03,
+    "eval_every": 5,
+    "early_stop_patience": 10
+  }
+}

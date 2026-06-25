@@ -3,6 +3,7 @@ import torch
 
 @torch.no_grad()
 def filtered_link_prediction(model, dataset, incidence, text_features, visual_features, triples, device):
+    """Evaluate head and tail prediction with the filtered KGC protocol."""
     model.eval()
     ze, zr = model.encode(incidence, text_features, visual_features)
     ranks = []
@@ -36,4 +37,3 @@ def filtered_link_prediction(model, dataset, incidence, text_features, visual_fe
 def _rank(scores, target):
     target_score = scores[target]
     return int((scores > target_score).sum().item()) + 1
-

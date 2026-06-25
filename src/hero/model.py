@@ -4,6 +4,8 @@ import torch.nn.functional as F
 
 
 class HypergraphConv(nn.Module):
+    """Node-hyperedge-node propagation over a relation incidence matrix."""
+
     def __init__(self, dim, layers, dropout):
         super().__init__()
         self.weights = nn.ModuleList([nn.Linear(dim, dim, bias=False) for _ in range(layers)])
@@ -23,6 +25,8 @@ class HypergraphConv(nn.Module):
 
 
 class TripleScorer(nn.Module):
+    """Two-layer interaction scorer for candidate triples."""
+
     def __init__(self, dim, hidden_dim, dropout):
         super().__init__()
         self.net = nn.Sequential(
@@ -38,6 +42,8 @@ class TripleScorer(nn.Module):
 
 
 class HERO(nn.Module):
+    """Reference HERO model reconstructed from the manuscript equations."""
+
     def __init__(self, num_entities, num_relations, text_dim, visual_dim, dim=256, hidden_dim=512, hyper_layers=2, dropout=0.2):
         super().__init__()
         self.entity_fallback = nn.Embedding(num_entities, dim)
@@ -62,6 +68,7 @@ class HERO(nn.Module):
         return F.relu(self.fuse(torch.cat(parts, dim=-1)))
 
     def encode(self, incidence, text_features=None, visual_features=None):
+        """Encode entities and relation hyperedges with hypergraph convolution."""
         x0 = self.initial_entities(text_features, visual_features)
         ze = self.hyper(x0, incidence)
         de = incidence.sum(dim=0).clamp_min(1.0)
@@ -73,6 +80,7 @@ class HERO(nn.Module):
         return self.pretrain_scorer(ze[h], zr[r], ze[t])
 
     def reason_score(self, ze, zr, h, r, t):
+        """Score candidate triples with a compact relation-conditioned reasoning gate."""
         zh, zt, zrel = ze[h], ze[t], zr[r]
         gate = torch.sigmoid(self.global_gate(torch.cat([zh, zrel, zt], dim=-1)))
         zh_ctx = gate * zh + (1.0 - gate) * zrel
@@ -80,6 +88,7 @@ class HERO(nn.Module):
         return self.reason_scorer(zh_ctx, zrel, zt_ctx), zh_ctx, zt_ctx
 
     def hyperedge_contrastive_loss(self, ze, incidence, replace_ratio=0.2):
+        """Contrast real relation hyperedges with perturbed hyperedges."""
         de = incidence.sum(dim=0).clamp_min(1.0)
         real = (incidence.t() @ ze) / de[:, None]
         global_vec = torch.tanh(real.mean(dim=0, keepdim=True)).expand_as(real)
@@ -98,6 +107,7 @@ class HERO(nn.Module):
         return F.binary_cross_entropy_with_logits(pos, ones) + F.binary_cross_entropy_with_logits(neg, zeros)
 
     def perturbation_loss(self, ze, zr, h, r, t, sigma_entity, sigma_relation):
+        """Compute clean scores and perturbation consistency losses."""
         clean_score, clean_h, clean_t = self.reason_score(ze, zr, h, r, t)
         ze_p = ze + torch.randn_like(ze) * sigma_entity
         zr_p = zr + torch.randn_like(zr) * sigma_relation
@@ -105,4 +115,3 @@ class HERO(nn.Module):
         emb_loss = F.mse_loss(pert_h, clean_h.detach()) + F.mse_loss(pert_t, clean_t.detach())
         score_loss = F.mse_loss(torch.sigmoid(pert_score), torch.sigmoid(clean_score.detach()))
         return clean_score, emb_loss, score_loss
-

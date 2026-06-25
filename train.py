@@ -15,6 +15,7 @@ from hero.utils import batch_iter, load_json, resolve_device, set_seed
 
 
 def main():
+    """Run the two-stage HERO training pipeline from a JSON configuration file."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
     args = parser.parse_args()
@@ -45,6 +46,9 @@ def main():
 
     print(f"Dataset: {cfg['dataset']['name']}")
     print(f"Entities={dataset.num_entities}, Relations={dataset.num_relations}, Train={len(dataset.train)}")
+
+    # Stage 1 follows the manuscript's MKGPH pre-training objective:
+    # triple discrimination plus hyperedge-level contrastive learning.
     print("Stage 1: MKGPH pre-training")
     for epoch in range(1, cfg["train"]["pretrain_epochs"] + 1):
         model.train()
@@ -63,6 +67,8 @@ def main():
             total += float(loss.detach())
         print(f"pretrain_epoch={epoch} loss={total:.4f}")
 
+    # Stage 2 initializes relation-aware reasoning from the pre-trained embeddings
+    # and adds embedding-level plus score-level perturbation consistency.
     print("Stage 2: relation-aware reasoning with perturbation consistency")
     best_mrr = -1.0
     patience = 0
@@ -111,4 +117,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
