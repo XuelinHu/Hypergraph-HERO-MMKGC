@@ -10,9 +10,13 @@ class KGDataset:
 
     def __init__(self, root):
         self.root = Path(root)
+        # Mapping files are optional because some public benchmark packages store
+        # triples directly as contiguous numeric IDs.
         self.entity2id = self._load_mapping("entity2id.txt")
         self.relation2id = self._load_mapping("relation2id.txt")
 
+        # All splits may extend the mapping when string IDs are used, which keeps
+        # demo data and raw benchmark text files compatible with the same loader.
         self.train = self._load_triples(["train.txt", "train2id.txt"], build_mapping=True)
         self.valid = self._load_triples(["valid.txt", "valid2id.txt"], build_mapping=True)
         self.test = self._load_triples(["test.txt", "test2id.txt"], build_mapping=True)
@@ -31,6 +35,8 @@ class KGDataset:
         if not path.exists():
             return mapping
         with open(path, "r", encoding="utf-8") as f:
+            # Support both "name id" and "id name" layouts, with or without an
+            # initial count line.
             first = f.readline().strip().split()
             rows = f.readlines()
             if len(first) == 2:
@@ -72,6 +78,8 @@ class KGDataset:
         return triples
 
     def _finalize_numeric_mappings(self):
+        # When only numeric triples are available, infer dense ID spaces from all
+        # observed heads, tails, and relations.
         triples = self.train + self.valid + self.test
         if not triples:
             return
@@ -83,6 +91,8 @@ class KGDataset:
             self.relation2id = {str(i): i for i in range(max_relation + 1)}
 
     def _load_features(self, names):
+        # Public MMKGC repositories use slightly different names for text and
+        # image features; try common variants before falling back to None.
         for name in names:
             path = self.root / name
             if not path.exists():
@@ -95,6 +105,8 @@ class KGDataset:
         return None
 
     def _build_adjacency(self, triples):
+        # Store an undirected training adjacency for local context extraction and
+        # future relation-aware reasoning extensions.
         adj = defaultdict(list)
         for h, r, t in triples:
             adj[h].append((r, t))
@@ -102,6 +114,8 @@ class KGDataset:
         return adj
 
     def build_incidence(self):
+        # Each relation type is treated as one hyperedge connecting all entities
+        # that participate in that relation in the training graph.
         h_mat = torch.zeros(self.num_entities, self.num_relations)
         for h, r, t in self.train:
             h_mat[h, r] = 1.0
@@ -109,6 +123,9 @@ class KGDataset:
         return h_mat
 
     def negative_sample(self, triples, negative_ratio=1):
+        # Random head/tail corruption creates binary training samples for the
+        # reference implementation. More advanced samplers can reuse this output
+        # shape: (head, relation, tail, label).
         samples = []
         for h, r, t in triples:
             samples.append((h, r, t, 1.0))

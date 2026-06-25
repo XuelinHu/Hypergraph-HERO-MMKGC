@@ -13,6 +13,8 @@ class HypergraphConv(nn.Module):
 
     def forward(self, x, incidence):
         h = incidence
+        # Symmetric node normalization and inverse hyperedge-size normalization
+        # follow the standard node-hyperedge-node propagation pattern.
         dv = h.sum(dim=1).clamp_min(1.0).pow(-0.5)
         de = h.sum(dim=0).clamp_min(1.0).pow(-1.0)
         norm_left = dv[:, None] * h
@@ -37,6 +39,8 @@ class TripleScorer(nn.Module):
         )
 
     def forward(self, zh, zr, zt):
+        # Concatenate raw embeddings and pairwise interactions so the scorer can
+        # model both first-order and multiplicative triple evidence.
         u = torch.cat([zh, zr, zt, zh * zr, zr * zt, zh * zt], dim=-1)
         return self.net(u).squeeze(-1)
 
@@ -58,6 +62,8 @@ class HERO(nn.Module):
         self.discriminator = nn.Bilinear(dim, dim, 1)
 
     def initial_entities(self, text_features=None, visual_features=None):
+        # Prefer available multimodal features; fall back to trainable entity
+        # embeddings for structural debugging or synthetic demo datasets.
         parts = []
         if text_features is not None and self.text_proj is not None:
             parts.append(F.relu(self.text_proj(text_features)))
@@ -71,6 +77,8 @@ class HERO(nn.Module):
         """Encode entities and relation hyperedges with hypergraph convolution."""
         x0 = self.initial_entities(text_features, visual_features)
         ze = self.hyper(x0, incidence)
+        # Relation embeddings are pooled from their incident entities and offset
+        # by a trainable relation bias.
         de = incidence.sum(dim=0).clamp_min(1.0)
         zr = (incidence.t() @ ze) / de[:, None]
         zr = zr + self.relation_bias.weight
@@ -82,6 +90,8 @@ class HERO(nn.Module):
     def reason_score(self, ze, zr, h, r, t):
         """Score candidate triples with a compact relation-conditioned reasoning gate."""
         zh, zt, zrel = ze[h], ze[t], zr[r]
+        # The gate approximates candidate-specific relation-aware reasoning by
+        # mixing endpoint evidence with the queried relation representation.
         gate = torch.sigmoid(self.global_gate(torch.cat([zh, zrel, zt], dim=-1)))
         zh_ctx = gate * zh + (1.0 - gate) * zrel
         zt_ctx = gate * zt + (1.0 - gate) * zrel
@@ -93,6 +103,8 @@ class HERO(nn.Module):
         real = (incidence.t() @ ze) / de[:, None]
         global_vec = torch.tanh(real.mean(dim=0, keepdim=True)).expand_as(real)
 
+        # Perturb relation hyperedges by randomly toggling a small subset of
+        # incidence entries, then discriminate real and perturbed summaries.
         noise = incidence.clone()
         if replace_ratio > 0:
             mask = torch.rand_like(noise) < (replace_ratio * noise.mean().clamp_min(1e-6))
@@ -109,6 +121,8 @@ class HERO(nn.Module):
     def perturbation_loss(self, ze, zr, h, r, t, sigma_entity, sigma_relation):
         """Compute clean scores and perturbation consistency losses."""
         clean_score, clean_h, clean_t = self.reason_score(ze, zr, h, r, t)
+        # Gaussian perturbations simulate noisy modality and structure-sensitive
+        # embedding states while keeping the clean branch as the consistency target.
         ze_p = ze + torch.randn_like(ze) * sigma_entity
         zr_p = zr + torch.randn_like(zr) * sigma_relation
         pert_score, pert_h, pert_t = self.reason_score(ze_p, zr_p, h, r, t)

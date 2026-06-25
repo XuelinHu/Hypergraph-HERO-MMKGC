@@ -16,6 +16,8 @@ from hero.utils import batch_iter, load_json, resolve_device, set_seed
 
 def main():
     """Run the two-stage HERO training pipeline from a JSON configuration file."""
+    # The config file owns all dataset, model, and training hyperparameters so
+    # experiments can be reproduced without changing this entrypoint.
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
     args = parser.parse_args()
@@ -23,6 +25,8 @@ def main():
     set_seed(cfg["train"].get("seed", 42))
     device = resolve_device(cfg["train"].get("device", "cuda"))
 
+    # Load triples, multimodal features, and the relation incidence matrix used
+    # by the relation-hypergraph encoder.
     dataset = KGDataset(cfg["dataset"]["root"])
     incidence = dataset.build_incidence().to(device)
     text = dataset.text_features.to(device) if dataset.text_features is not None else None
@@ -56,6 +60,8 @@ def main():
         samples = dataset.negative_sample(dataset.train, cfg["train"]["negative_ratio"])
         for batch in tqdm(batch_iter(samples, cfg["train"]["batch_size"]), desc=f"pretrain {epoch}", leave=False):
             h, r, t, y = dataset.as_tensors(batch, device)
+            # Recompute encoded representations each batch so gradients flow
+            # through the current hypergraph and modality projection parameters.
             ze, zr = model.encode(incidence, text, visual)
             score = model.pretrain_score(ze, zr, h, r, t)
             ht_loss = F.binary_cross_entropy_with_logits(score, y)
@@ -98,6 +104,8 @@ def main():
 
         print(f"finetune_epoch={epoch} loss={total:.4f}")
         if epoch % cfg["train"]["eval_every"] == 0:
+            # Validation uses the filtered protocol so known true triples do not
+            # unfairly count as negatives during ranking.
             metrics = filtered_link_prediction(model, dataset, incidence, text, visual, dataset.valid, device)
             print(f"valid {metrics}")
             if metrics["MRR"] > best_mrr:

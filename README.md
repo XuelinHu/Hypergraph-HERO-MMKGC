@@ -29,6 +29,7 @@ be treated as the original experiment code.
 |   |-- mkg_w.json
 |   `-- mkg_y.json
 |-- scripts/
+|   |-- prepare_demo_datasets.py
 |   |-- train_db15k.ps1
 |   |-- train_mkg_w.ps1
 |   |-- train_mkg_y.ps1
@@ -37,6 +38,7 @@ be treated as the original experiment code.
 |   `-- hero/
 |       |-- data.py
 |       |-- evaluate.py
+|       |-- baseline_models.py
 |       |-- model.py
 |       `-- utils.py
 `-- papers/
@@ -91,6 +93,26 @@ back to trainable entity embeddings for structural debugging only.
 
 See `DATASETS.md` for dataset source and redistribution notes.
 
+Create tiny demo datasets for smoke tests:
+
+```bash
+conda run -n pyg python scripts/prepare_demo_datasets.py --output-root data/demo
+```
+
+The script tries to download small public source README snippets for DB15K,
+MKG-W, and MKG-Y, then writes loader-compatible demo splits under
+`data/demo/<dataset>/`. These demo files are synthetic and are only intended for
+code checks; they are not replacements for the full public benchmarks.
+
+## Baseline Model Scaffolds
+
+`src/hero/baseline_models.py` provides lightweight PyTorch source-code scaffolds
+for the comparison models listed in the manuscript, including TransE, ComplEx,
+RotatE, QuatE, DualE, BiQUE, IKRL, TransAE, VBKGC, OTKGE, QEB, VISTA, AdaMF,
+MyGO, K-ON, MoSE, MMRNS, IMF, MoMoK, and M-Hyper. These classes share a
+`score(h, r, t, text_features, visual_features)` interface and are reference
+implementations, not official reproductions of the original papers.
+
 ## Training
 
 Run a single dataset:
@@ -129,4 +151,3 @@ The badges above are based on directly present repository files:
 
 - `requirements.txt`: PyTorch, NumPy, and tqdm.
 - `papers/**/*.tex`: LaTeX manuscript packages.
-
