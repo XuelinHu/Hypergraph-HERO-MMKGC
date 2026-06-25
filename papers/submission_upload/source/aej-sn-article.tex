@@ -28,14 +28,13 @@
 \author[1]{\fnm{Jingchao} \sur{Wang}}\email{static@zut.edu.cn}
 \author[1]{\fnm{Xiaodan} \sur{Cui}}\email{cuixiaodan2026@163.com}
 \author*[2]{\fnm{Xuelin} \sur{Hu}}\email{huxl@ltzy.edu.cn}
-\author[3]{\fnm{Xinyi} \sur{Zhang}}\email{xinyizhang@shu.edu.cn}
-\author[4]{\fnm{Fangyu} \sur{Liu}}\email{fy.liu1@siat.ac.cn}
+\author[3]{\fnm{Youjing} \sur{Fu}}\email{fuyj2025@lzu.edu.cn}
+% ORCID: 0009-0004-1369-7879
 \author[2]{\fnm{Xiaoqin} \sur{Fu}}\email{fuxiaoqin@ltzy.edu.cn}
 
 \affil[1]{\orgname{School of Computer Science, Zhongyuan University of Technology}, \orgaddress{\city{Zhengzhou}, \postcode{450007}, \country{China}}}
 \affil*[2]{\orgname{School of Railway Communication and Signaling Engineering, Liuzhou Railway Vocational Technical College}, \orgaddress{\city{Liuzhou}, \postcode{545000}, \country{China}}}
-\affil[3]{\orgname{School of Computer Engineering and Science, Shanghai University}, \orgaddress{\city{Shanghai}, \postcode{200000}, \country{China}}}
-\affil[4]{\orgname{Shenzhen Institute of Advanced Technology, University of Chinese Academy of Sciences}, \orgaddress{\city{Shenzhen}, \postcode{518055}, \country{China}}}
+\affil[3]{\orgname{College of Earth and Environmental Sciences, Lanzhou University}, \orgaddress{\city{Lanzhou}, \postcode{730000}, \country{China}}}
 
 \abstract{Multimodal Knowledge Graph Completion (MMKGC) infers missing facts by combining structural triples with auxiliary information such as text and images. Existing methods usually improve entity representations through multimodal fusion, but their structural modeling still largely follows pairwise relation edges, which limits their ability to capture higher-order dependencies among entities sharing the same relation semantics. They are also vulnerable to noisy descriptions, irrelevant visual signals, and structural perturbations, which can disturb representation learning and reduce the score margin between correct and confusing candidates. This paper proposes HERO, a hypergraph-enhanced relation-aware robust reasoning framework for MMKGC. To address the limitation of pairwise structural modeling, HERO represents each relation type as a relation-specific hyperedge and performs multimodal pre-training on the resulting relation hypergraph, integrating textual, visual, and high-order structural information into entity and relation representations. To exploit target-specific evidence, HERO builds context-aware subgraphs from bidirectional neighborhoods and relation-relevant multi-hop paths, and uses a relation-aware graph attention network to aggregate local evidence for each candidate triple. To improve robustness, a perturbation consistency objective aligns clean and perturbed branches at both representation and score levels, improving ranking stability under multimodal noise and structural perturbations. Experiments on three MMKGC benchmarks show that HERO achieves consistent improvements over competitive baselines, while ablation and robustness analyses verify the contribution of relation hypergraph modeling, candidate-specific reasoning, and perturbation consistency.}
 
