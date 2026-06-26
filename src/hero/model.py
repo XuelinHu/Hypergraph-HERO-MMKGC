@@ -129,4 +129,3 @@ class HERO(nn.Module):
         emb_loss = F.mse_loss(pert_h, clean_h.detach()) + F.mse_loss(pert_t, clean_t.detach())
         score_loss = F.mse_loss(torch.sigmoid(pert_score), torch.sigmoid(clean_score.detach()))
         return clean_score, emb_loss, score_loss
- 

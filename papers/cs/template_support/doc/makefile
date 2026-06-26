@@ -34,4 +34,3 @@ diff:
 
 copy:
 	cp $(file).sty ../
- 

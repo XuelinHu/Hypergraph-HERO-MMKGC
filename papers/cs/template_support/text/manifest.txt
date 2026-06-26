@@ -92,4 +92,3 @@ Contains images used in the sample PDF.
  cas-grabs.pdf
  cas-munnar-2024.jpg
  cas-pic1.pdf
- 

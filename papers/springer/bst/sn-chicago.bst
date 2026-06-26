@@ -1681,4 +1681,3 @@ FUNCTION {end.bib}
 EXECUTE {end.bib}
 
 %% End of file `sn-chicago.bst'.
- 

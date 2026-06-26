@@ -144,4 +144,3 @@ class KGDataset:
         t = torch.tensor([x[2] for x in samples], dtype=torch.long, device=device)
         y = torch.tensor([x[3] for x in samples], dtype=torch.float32, device=device)
         return h, r, t, y
- 

@@ -2019,4 +2019,3 @@ EXECUTE {end.bib}
 %%
 %% End of file `sn-vancouver-num.bst'.
 
- 

@@ -6,4 +6,3 @@ This directory separates manuscript materials by journal/template target.
 - `springer/`: Springer Nature manuscript package.
 - `submission_upload/`: prepared submission package with PDF, source, figures, and notes.
 
- 

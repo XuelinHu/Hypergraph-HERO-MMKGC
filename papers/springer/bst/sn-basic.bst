@@ -1816,4 +1816,3 @@ EXECUTE {end.bib}
 
 %% End of file `sn-basic.bst'.
 
- 
