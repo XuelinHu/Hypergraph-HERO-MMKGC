@@ -57,6 +57,28 @@ be treated as the original experiment code.
 - Perturbation-consistent robust scoring.
 - Filtered link prediction with MRR and Hits@1/3/10.
 
+## Source Code Modules
+
+The `src/hero/` package contains the runnable reference implementation used by
+`train.py`:
+
+- `src/hero/__init__.py`: exposes the public package API, including `HERO`,
+  `KGDataset`, `BASELINE_REGISTRY`, and `build_baseline`.
+- `src/hero/data.py`: implements `KGDataset`, which loads DB15K, MKG-W, and
+  MKG-Y style triples, optional mapping files, text/image features, relation
+  hypergraph incidence matrices, adjacency lists, and random negative samples.
+- `src/hero/model.py`: implements the HERO reference model, including
+  `HypergraphConv`, `TripleScorer`, multimodal entity initialization,
+  relation-hyperedge encoding, hyperedge contrastive pre-training, and
+  perturbation-consistency losses.
+- `src/hero/evaluate.py`: implements filtered link prediction for head and tail
+  ranking and reports MRR plus Hits@1/3/10.
+- `src/hero/baseline_models.py`: provides lightweight PyTorch scaffolds for the
+  comparison models discussed in the manuscript, such as TransE, DistMult,
+  ComplEx, RotatE, QuatE, IKRL, TransAE, VISTA, MoSE, MoMoK, and M-Hyper.
+- `src/hero/utils.py`: contains shared helpers for JSON loading, random seeding,
+  device selection, directory creation, and mini-batch iteration.
+
 ## Installation
 
 ```bash
@@ -135,7 +157,7 @@ Run with PowerShell scripts:
 ## Verification
 
 ```bash
-conda run -n pyg python -m py_compile train.py src/hero/__init__.py src/hero/data.py src/hero/model.py src/hero/evaluate.py src/hero/utils.py
+conda run -n pyg python -m py_compile train.py src/hero/__init__.py src/hero/data.py src/hero/model.py src/hero/evaluate.py src/hero/baseline_models.py src/hero/utils.py
 ```
 
 ## Paper Packages
