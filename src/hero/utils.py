@@ -39,3 +39,4 @@ def batch_iter(items, batch_size, shuffle=True):
         random.shuffle(idx)
     for start in range(0, len(idx), batch_size):
         yield [items[i] for i in idx[start:start + batch_size]]
+ 

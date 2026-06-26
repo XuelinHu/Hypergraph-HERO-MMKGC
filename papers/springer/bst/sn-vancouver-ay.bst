@@ -2082,4 +2082,4 @@ FUNCTION {end.bib}
 EXECUTE {end.bib}
 %% End of customized bst file
 %%
-%% End of file `sn-vancouver-ay.bst'.
+%% End of file `sn-vancouver-ay.bst'. 
